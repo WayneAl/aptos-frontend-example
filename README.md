@@ -10,7 +10,7 @@ In the project directory, you can run:
 
 `npm start`
 
-## Publish hello_blockchain to your address
+## Publish `hello_blockchain` to your address
 
 `cd aptos-move/move-examples/hello_blockchain`
 
