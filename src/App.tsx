@@ -25,7 +25,6 @@ function App() {
       <Navbar />
       <WalletProvider wallets={wallets} autoConnect={autoConnect}>
         <HippoPontemWallet autoConnect={autoConnect} />
-        <Main />
       </WalletProvider>
     </div>
   );

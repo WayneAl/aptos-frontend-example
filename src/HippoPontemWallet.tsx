@@ -17,12 +17,6 @@ export const HippoPontemWallet = ({ autoConnect }: { autoConnect: boolean }) => 
   const onModalOpen = () => setIsModalOpen(true);
 
   const [client, setClient] = useState(new AptosClient('https://fullnode.devnet.aptoslabs.com'));
-  useEffect(() => {
-    if (!wallet) return;
-    if (!wallet.adapter.url) return;
-    const client = new AptosClient(wallet.adapter.url);
-    setClient(client);
-  }, [wallet]);
 
   const adapters = wallets.map((item) => ({
     name: item?.adapter.name,
@@ -85,16 +79,17 @@ export const HippoPontemWallet = ({ autoConnect }: { autoConnect: boolean }) => 
   }, [currentAddress]);
 
   // Check for the module; show publish instructions if not present.
-  const [modules, setModules] = React.useState<Types.MoveModuleBytecode[]>([]);
+  const [modules, setModules] = React.useState<boolean>(false);
   React.useEffect(() => {
     if (!currentAddress) return;
-    client.getAccountModules(currentAddress).then(setModules);
+    client.getAccountModules(currentAddress).then((ms) => {
+      ms.some((m) => {
+        if (m.abi?.name === 'message') {
+          setModules(true);
+        }
+      });
+    });
   }, [currentAddress]);
-
-  const hasModule = modules.some((m) => {
-    console.log(m);
-    return m.abi?.name === 'message';
-  });
 
   // Call set_message with the textarea value on submit.
   const ref = React.createRef<HTMLTextAreaElement>();
@@ -152,7 +147,7 @@ export const HippoPontemWallet = ({ autoConnect }: { autoConnect: boolean }) => 
 
       {!connected && <Hint hint={'connect wallet'} />}
 
-      {hasModule && (
+      {modules && (
         <form onSubmit={handleSubmit}>
           <textarea ref={ref} defaultValue={rev} />
           <input disabled={isSaving} type='submit' />
